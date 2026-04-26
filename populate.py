@@ -76,3 +76,38 @@
 # 10. Insertar notificaciones por estudiante en notifications_by_student
 # - Campos: student_id, notification_time, notification_id, notification_type, title, message, course_id, read_status.
 # - Uso: consultar las notificaciones recientes recibidas por un estudiante.
+#########################
+
+# (mantener todo lo que ya tienen de Mongo y Cassandra)
+# ...
+
+# Dgraph Data Population Script for VibeCoders
+# 1. Aplicar schema
+# - Leer Dgraph/schema.dql y aplicarlo via pydgraph set_schema()
+
+# 2. Insertar nodos base desde CSV
+# - Leer data/alumnos.csv → insertar nodos tipo Alumno
+# - Leer data/cursos.csv → insertar nodos tipo Curso (incluye horario RF07)
+# - Leer data/maestros.csv → insertar nodos tipo Maestro
+# - Leer data/tareas.csv → insertar nodos tipo Tarea
+# - Leer data/examenes.csv → insertar nodos tipo Examen
+# - Leer data/certificados.csv → insertar nodos tipo Certificado
+
+# 3. Obtener UIDs reales
+# - Consultar UIDs de cada nodo recien insertado con func: type()
+# - Construir un mapa id_logico → UID (ej. "A1" → "0x4e2e")
+
+# 4. Insertar relaciones con facetas (RF01-RF10)
+# - RF01: inscrito_en con facetas enrolled_at y status
+# - RF02: imparte con faceta assigned_at
+# - RF03: entrega_tarea con facetas submitted_at, status, score
+# - RF04: realiza_examen con facetas attempt_date, score
+# - RF05: contiene_tarea con faceta due_date
+# - RF06: score ya incluido como faceta en RF03 y RF04
+# - RF07: horario ya insertado como atributos en nodo Curso (paso 2)
+# - RF08: facetas adicionales en inscrito_en: last_access, sessions_count, activity_status
+# - RF09: es_prerrequisito_de entre nodos Curso
+# - RF10: facetas adicionales en inscrito_en: progress, last_access
+
+# 5. Verificar datos
+# - Consultar alumnos con sus relaciones y facetas para confirmar insercion correcta
