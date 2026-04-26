@@ -1,0 +1,57 @@
+# Schema aplicado en Ratel → Schema → Bulk Edit → Apply Schema
+
+# TIPOS DE NODO
+type Alumno {
+  id_alumno  nombre  genero
+  inscrito_en  realiza_examen  entrega_tarea  obtiene_certificado
+}
+type Curso {
+  id_curso  nombre  categoria
+  contiene_tarea  tiene_examenes
+  day_of_week  start_time  end_time
+  es_prerrequisito_de
+}
+type Examen { id_examen  preguntas }
+type Maestro {
+  id_maestro  nombre  genero
+  imparte
+}
+type Tarea { id_tarea }
+type Certificado { id_certificado  fecha  categoria }
+
+# PREDICADOS
+nombre: string @index(exact) .
+id_alumno: string @index(exact) .
+id_curso: string @index(exact) .
+id_examen: string @index(exact) .
+id_maestro: string @index(exact) .
+id_tarea: string @index(exact) .
+id_certificado: string @index(exact) .
+genero: string .
+categoria: string @index(exact) .
+preguntas: string .
+day_of_week: string .
+start_time: string .
+end_time: string .
+fecha: datetime .
+
+# RELACIONES
+# inscrito_en tiene @reverse para navegar desde Curso hacia Alumnos con ~inscrito_en
+# Facetas usadas: enrolled_at, status, progress, last_access, sessions_count, activity_status
+inscrito_en: [uid] @reverse .
+
+# Faceta: assigned_at
+imparte: [uid] .
+
+# Facetas: submitted_at, status, score
+entrega_tarea: [uid] @reverse .
+
+# Facetas: attempt_date, score
+realiza_examen: [uid] @reverse .
+
+# Faceta: due_date
+contiene_tarea: [uid] @reverse .
+
+tiene_examenes: [uid] .
+obtiene_certificado: [uid] .
+es_prerrequisito_de: [uid] @reverse .

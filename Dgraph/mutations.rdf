@@ -1,0 +1,68 @@
+# IMPORTANTE: Los nodos base se insertan desde populate.py leyendo los CSV en data/.
+# Este archivo contiene las relaciones entre nodos usando UIDs reales.
+# Ejecutar queries.dql (bloque get_uids) para obtener los UIDs antes de correr esto.
+# Reemplazar cada 0xUID_X con el UID real asignado por Dgraph.
+
+{
+  set {
+    # RF01 — Inscripcion de alumnos a cursos
+    # Facetas: enrolled_at (fecha de inscripcion), status (activo/completado/baja)
+    <0xUID_A1> <inscrito_en> <0xUID_C1> (enrolled_at="2026-01-10T00:00:00Z", status="activo") .
+    <0xUID_A2> <inscrito_en> <0xUID_C1> (enrolled_at="2026-01-10T00:00:00Z", status="activo") .
+    <0xUID_A2> <inscrito_en> <0xUID_C2> (enrolled_at="2026-01-12T00:00:00Z", status="completado") .
+    <0xUID_A3> <inscrito_en> <0xUID_C2> (enrolled_at="2026-01-12T00:00:00Z", status="activo") .
+    <0xUID_A3> <inscrito_en> <0xUID_C3> (enrolled_at="2026-01-15T00:00:00Z", status="activo") .
+
+    # RF02 — Asignacion de maestro a curso
+    # Faceta: assigned_at (fecha de asignacion)
+    <0xUID_M1> <imparte> <0xUID_C1> (assigned_at="2026-01-05T00:00:00Z") .
+    <0xUID_M2> <imparte> <0xUID_C2> (assigned_at="2026-01-05T00:00:00Z") .
+    <0xUID_M3> <imparte> <0xUID_C3> (assigned_at="2026-01-06T00:00:00Z") .
+
+    # RF03 — Entrega de tareas
+    # Facetas: submitted_at, status (entregado/pendiente/tarde), score
+    <0xUID_A1> <entrega_tarea> <0xUID_T1> (submitted_at="2026-05-01T00:00:00Z", status="entregado", score=90) .
+    <0xUID_A2> <entrega_tarea> <0xUID_T2> (submitted_at="2026-05-09T00:00:00Z", status="entregado", score=80) .
+    <0xUID_A3> <entrega_tarea> <0xUID_T3> (submitted_at="2026-06-01T00:00:00Z", status="entregado", score=70) .
+
+    # RF04 — Examenes realizados
+    # Facetas: attempt_date, score
+    <0xUID_A1> <realiza_examen> <0xUID_E1> (attempt_date="2026-04-15T00:00:00Z", score=85) .
+    <0xUID_A2> <realiza_examen> <0xUID_E2> (attempt_date="2026-04-15T00:00:00Z", score=60) .
+    <0xUID_A3> <realiza_examen> <0xUID_E3> (attempt_date="2026-04-16T00:00:00Z", score=95) .
+
+    # RF05 — Tareas asociadas a cursos
+    # Faceta: due_date (fecha limite de entrega)
+    <0xUID_C1> <contiene_tarea> <0xUID_T1> (due_date="2026-05-01T00:00:00Z") .
+    <0xUID_C2> <contiene_tarea> <0xUID_T2> (due_date="2026-05-10T00:00:00Z") .
+    <0xUID_C3> <contiene_tarea> <0xUID_T3> (due_date="2026-06-01T00:00:00Z") .
+
+    # RF06 — Calificaciones
+    # Se almacenan como faceta score en entrega_tarea y realiza_examen (ver RF03 y RF04)
+
+    # RF07 — Horarios
+    # Se almacenan como atributos directos en el nodo Curso (ver populate.py)
+
+    # RF08 — Actividad del alumno en el curso
+    # Facetas adicionales sobre inscrito_en: last_access, sessions_count, activity_status
+    <0xUID_A1> <inscrito_en> <0xUID_C1> (last_access="2026-04-20T00:00:00Z", sessions_count=12, activity_status="activo") .
+    <0xUID_A2> <inscrito_en> <0xUID_C2> (last_access="2026-03-10T00:00:00Z", sessions_count=3,  activity_status="inactivo") .
+    <0xUID_A3> <inscrito_en> <0xUID_C3> (last_access="2026-04-25T00:00:00Z", sessions_count=8,  activity_status="activo") .
+
+    # RF09 — Prerrequisitos entre cursos
+    # C2 debe completarse antes de C3, C3 antes de C4
+    <0xUID_C2> <es_prerrequisito_de> <0xUID_C3> .
+    <0xUID_C3> <es_prerrequisito_de> <0xUID_C4> .
+
+    # RF10 — Progreso del alumno en el curso
+    # Facetas adicionales sobre inscrito_en: progress (0-100), last_access
+    <0xUID_A1> <inscrito_en> <0xUID_C1> (progress=75,  last_access="2026-04-20T00:00:00Z") .
+    <0xUID_A2> <inscrito_en> <0xUID_C2> (progress=100, last_access="2026-03-10T00:00:00Z") .
+    <0xUID_A3> <inscrito_en> <0xUID_C3> (progress=40,  last_access="2026-04-25T00:00:00Z") .
+
+    # Certificados obtenidos
+    <0xUID_A1> <obtiene_certificado> <0xUID_CERT1> .
+    <0xUID_A2> <obtiene_certificado> <0xUID_CERT2> .
+    <0xUID_A3> <obtiene_certificado> <0xUID_CERT3> .
+  }
+}

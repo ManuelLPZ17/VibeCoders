@@ -1,0 +1,5 @@
+id_curso,nombre,categoria,day_of_week,start_time,end_time
+C1,Ingles 1A,Idiomas,Lunes,08:00,10:00
+C2,Matematicas Basicas,Matematicas,Martes,10:00,12:00
+C3,Programacion Web,Tecnologia,Miercoles,14:00,16:00
+C4,Programacion Avanzada,Tecnologia,Jueves,14:00,16:00

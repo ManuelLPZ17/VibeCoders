@@ -1,0 +1,123 @@
+# Ejecutar cada bloque por separado en Ratel → Console → Query
+
+# GET_UIDS: Obtener UIDs reales de todos los nodos (ejecutar antes de mutations.rdf)
+{
+  alumnos(func: type(Alumno))           { uid  id_alumno  nombre }
+  cursos(func: type(Curso))             { uid  id_curso   nombre }
+  maestros(func: type(Maestro))         { uid  id_maestro nombre }
+  tareas(func: type(Tarea))             { uid  id_tarea }
+  examenes(func: type(Examen))          { uid  id_examen }
+  certificados(func: type(Certificado)) { uid  id_certificado }
+}
+
+
+# Q01 — RF01: ¿En qué cursos está inscrito un alumno y cuál es su estado de inscripcion?
+{
+  resultado(func: eq(nombre, "Carlos Lopez")) {
+    nombre
+    inscrito_en @facets(enrolled_at, status) {
+      nombre
+    }
+  }
+}
+
+
+# Q02 — RF02: ¿Qué cursos imparte un maestro y desde cuándo fue asignado?
+{
+  maestros(func: type(Maestro)) {
+    nombre
+    imparte @facets(assigned_at) {
+      nombre
+    }
+  }
+}
+
+
+# Q03 — RF03: ¿Qué tareas ha entregado un alumno y cuál es su estado y calificacion?
+{
+  resultado(func: eq(nombre, "Carlos Lopez")) {
+    nombre
+    entrega_tarea @facets(submitted_at, status, score) {
+      id_tarea
+    }
+  }
+}
+
+
+# Q04 — RF04: ¿Qué alumnos presentaron un examen con calificacion reprobatoria (menor a 70)?
+{
+  alumnos(func: type(Alumno)) {
+    nombre
+    realiza_examen @filter(lt(score, 70)) @facets(attempt_date, score) {
+      id_examen
+    }
+  }
+}
+
+
+# Q05 — RF05: ¿Qué tareas contiene un curso y cuál es su fecha limite de entrega?
+{
+  resultado(func: eq(nombre, "Programacion Web")) {
+    nombre
+    contiene_tarea @facets(due_date) {
+      id_tarea
+    }
+  }
+}
+
+
+# Q06 — RF06: ¿Cuáles son las calificaciones de un alumno en tareas y examenes?
+{
+  resultado(func: eq(nombre, "Carlos Lopez")) {
+    nombre
+    entrega_tarea @facets(score) { id_tarea }
+    realiza_examen @facets(score) { id_examen }
+  }
+}
+
+
+# Q07 — RF07: ¿Cuál es el horario de cada curso?
+{
+  cursos(func: type(Curso)) {
+    nombre
+    day_of_week
+    start_time
+    end_time
+  }
+}
+
+
+# Q08 — RF08: ¿Cuál es el nivel de actividad de cada alumno en sus cursos?
+{
+  alumnos(func: type(Alumno)) {
+    nombre
+    inscrito_en @facets(last_access, sessions_count, activity_status) {
+      nombre
+    }
+  }
+}
+
+
+# Q09 — RF09: ¿Cuáles son los prerrequisitos de un curso y su cadena de dependencias?
+{
+  resultado(func: eq(nombre, "Programacion Avanzada")) {
+    nombre
+    ~es_prerrequisito_de {
+      nombre
+      ~es_prerrequisito_de {
+        nombre
+      }
+    }
+  }
+}
+
+
+# Q10 — RF10: ¿Cuál es el progreso actual de cada alumno en los cursos en los que está inscrito?
+{
+  alumnos(func: type(Alumno)) {
+    nombre
+    inscrito_en @facets(progress, last_access) {
+      nombre
+    }
+  }
+}
