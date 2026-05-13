@@ -3,7 +3,9 @@ main.py - Menu de consultas VibeCoders
 Primero pregunta qué BD usar, luego muestra solo las queries de esa BD.
 """
 
-from connect import connect_dgraph
+import importlib
+
+from connect import connect_cassandra, connect_dgraph
 
 MENU = {
     "MongoDB": {
@@ -19,13 +21,16 @@ MENU = {
         "10": "RF10 — Ver anuncios no leidos y engagement por curso",
     },
     "Cassandra": {
-        "7":  "Ver sesiones de estudio recientes",
-        "8":  "Ver avance por leccion",
-        "9":  "Ver intentos recientes de quizzes",
-        "10": "Ver actividad diaria de un estudiante",
-        "11": "Ver actividad reciente dentro de un curso",
-        "12": "Ver entregas de tareas",
-        "13": "Ver notificaciones recientes",
+        "1":  "RF01 — Ver sesiones de estudio recientes por estudiante",
+        "2":  "RF02 — Ver avance por lección de un estudiante en un curso",
+        "3":  "RF03 — Ver intentos recientes de quizzes por estudiante",
+        "4":  "RF04 — Ver intentos de quizzes por estudiante y curso",
+        "5":  "RF05 — Ver actividad diaria de un estudiante",
+        "6":  "RF06 — Ver eventos de video por estudiante",
+        "7":  "RF07 — Ver actividad reciente dentro de un curso",
+        "8":  "RF08 — Ver entregas de tareas por estudiante y curso",
+        "9":  "RF09 — Ver progreso de estudiantes por curso y lección",
+        "10": "RF10 — Ver notificaciones recientes por estudiante",
     },
     "Dgraph": {
         "14": "Ver cursos en que esta inscrito un alumno y su estado",
@@ -66,6 +71,30 @@ def show_queries_menu(db_name):
     print("  " + "-" * 36)
 
 
+def safe_populate(db_name, module_name, function_name):
+    try:
+        module = importlib.import_module(module_name)
+        populate = getattr(module, function_name)
+        populate(reset=True)
+    except Exception as exc:
+        print(f"  {db_name}: no se pudo poblar. {exc}")
+
+
+def run_cassandra_menu_option(option):
+    cluster, session = None, None
+    try:
+        cluster, session = connect_cassandra()
+        from Cassandra.queries_cassandra import run_cassandra_query
+        run_cassandra_query(option, session)
+    except Exception as exc:
+        print(f"  Cassandra: {exc}")
+    finally:
+        if session is not None:
+            session.shutdown()
+        if cluster is not None:
+            cluster.shutdown()
+
+
 def run_menu():
     dgraph_stub, dgraph_client = None, None
 
@@ -85,10 +114,9 @@ def run_menu():
                 break
 
             if db_choice.upper() == "P":
-                from Mongo.populate_mongo import populate_mongo
-                from Dgraph.populate_dgraph import populate_dgraph
-                populate_mongo(reset=True)
-                populate_dgraph(reset=True)
+                safe_populate("MongoDB", "Mongo.populate_mongo", "populate_mongo")
+                safe_populate("Cassandra", "Cassandra.populate_cassandra", "populate_cassandra")
+                safe_populate("Dgraph", "Dgraph.populate_dgraph", "populate_dgraph")
                 continue
 
             if db_choice not in ("1", "2", "3"):
@@ -116,13 +144,19 @@ def run_menu():
                 print(f"\n  [{db_name}] {option}: {queries[option]}")
 
                 if db_name == "Dgraph":
-                    from Dgraph.queries_dgraph import run_query
-                    run_query(option, get_dgraph())
+                    try:
+                        from Dgraph.queries_dgraph import run_query
+                        run_query(option, get_dgraph())
+                    except Exception as exc:
+                        print(f"  Dgraph: {exc}")
                 elif db_name == "MongoDB":
-                    from Mongo.queries_mongo import run_query as run_mongo_query
-                    run_mongo_query(option)
+                    try:
+                        from Mongo.queries_mongo import run_query as run_mongo_query
+                        run_mongo_query(option)
+                    except Exception as exc:
+                        print(f"  MongoDB: {exc}")
                 else:
-                    print("  (pendiente de implementacion)")
+                    run_cassandra_menu_option(option)
 
     finally:
         if dgraph_stub is not None:

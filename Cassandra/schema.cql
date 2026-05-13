@@ -1,12 +1,8 @@
-CREATE KEYSPACE IF NOT EXISTS vibecoders
-WITH replication = {
-    'class': 'SimpleStrategy',
-    'replication_factor': 1
-};
+CREATE KEYSPACE IF NOT EXISTS vibecoders WITH replication = {'class': 'SimpleStrategy', 'replication_factor': 1};
 
 USE vibecoders;
 
--- C01: ¿Cuáles han sido las sesiones de estudio más recientes de un estudiante y cuánto tiempo dedicó a cada una?
+-- RF01: sesiones de estudio recientes por estudiante
 CREATE TABLE IF NOT EXISTS sessions_by_student (
     student_id text,
     session_start timestamp,
@@ -17,7 +13,7 @@ CREATE TABLE IF NOT EXISTS sessions_by_student (
     PRIMARY KEY (student_id, session_start)
 ) WITH CLUSTERING ORDER BY (session_start DESC);
 
--- C02: ¿Qué lecciones de un curso ha completado o tiene en progreso un estudiante?
+-- RF02: avance por leccion de un estudiante en un curso
 CREATE TABLE IF NOT EXISTS lesson_progress_by_student_course (
     student_id text,
     course_id text,
@@ -28,7 +24,7 @@ CREATE TABLE IF NOT EXISTS lesson_progress_by_student_course (
     PRIMARY KEY ((student_id, course_id), lesson_id)
 );
 
--- C03: ¿Qué cuestionarios ha presentado recientemente un estudiante y qué resultado obtuvo en cada uno?
+-- RF03: intentos recientes de quizzes por estudiante
 CREATE TABLE IF NOT EXISTS quiz_attempts_by_student (
     student_id text,
     attempt_time timestamp,
@@ -39,7 +35,7 @@ CREATE TABLE IF NOT EXISTS quiz_attempts_by_student (
     PRIMARY KEY (student_id, attempt_time)
 ) WITH CLUSTERING ORDER BY (attempt_time DESC);
 
--- C04: ¿Qué cuestionarios ha presentado un estudiante dentro de un curso específico y qué resultado obtuvo en cada uno?
+-- RF04: intentos de quizzes por estudiante y curso
 CREATE TABLE IF NOT EXISTS quiz_attempts_by_student_course (
     student_id text,
     course_id text,
@@ -50,7 +46,7 @@ CREATE TABLE IF NOT EXISTS quiz_attempts_by_student_course (
     PRIMARY KEY ((student_id, course_id), attempt_time)
 ) WITH CLUSTERING ORDER BY (attempt_time DESC);
 
--- C05: ¿Qué acciones realizó un estudiante dentro de la plataforma en un día determinado?
+-- RF05: actividad diaria de un estudiante
 CREATE TABLE IF NOT EXISTS activity_by_student_day (
     student_id text,
     activity_date date,
@@ -62,7 +58,7 @@ CREATE TABLE IF NOT EXISTS activity_by_student_day (
     PRIMARY KEY ((student_id, activity_date), event_time)
 ) WITH CLUSTERING ORDER BY (event_time DESC);
 
--- C06: ¿Qué actividad reciente ha tenido un estudiante con los videos educativos de la plataforma?
+-- RF06: eventos de video por estudiante
 CREATE TABLE IF NOT EXISTS video_events_by_student (
     student_id text,
     event_time timestamp,
@@ -74,7 +70,7 @@ CREATE TABLE IF NOT EXISTS video_events_by_student (
     PRIMARY KEY (student_id, event_time)
 ) WITH CLUSTERING ORDER BY (event_time DESC);
 
--- C07: ¿Qué actividad ocurrió dentro de un curso en un día determinado y qué estudiantes participaron?
+-- RF07: actividad reciente dentro de un curso por fecha
 CREATE TABLE IF NOT EXISTS activity_by_course_day (
     course_id text,
     activity_date date,
@@ -86,7 +82,7 @@ CREATE TABLE IF NOT EXISTS activity_by_course_day (
     PRIMARY KEY ((course_id, activity_date), event_time, student_id)
 ) WITH CLUSTERING ORDER BY (event_time DESC, student_id ASC);
 
--- C08: ¿Qué tareas ha entregado un estudiante dentro de un curso y cuál es el estado de cada entrega?
+-- RF08: entregas de tareas por estudiante y curso
 CREATE TABLE IF NOT EXISTS submissions_by_student_course (
     student_id text,
     course_id text,
@@ -98,7 +94,7 @@ CREATE TABLE IF NOT EXISTS submissions_by_student_course (
     PRIMARY KEY ((student_id, course_id), submitted_at, assignment_id)
 ) WITH CLUSTERING ORDER BY (submitted_at DESC, assignment_id ASC);
 
--- C09: ¿Qué estudiantes han avanzado o completado una lección específica dentro de un curso?
+-- RF09: progreso de estudiantes por curso y leccion
 CREATE TABLE IF NOT EXISTS lesson_progress_by_course_lesson (
     course_id text,
     lesson_id text,
@@ -109,7 +105,7 @@ CREATE TABLE IF NOT EXISTS lesson_progress_by_course_lesson (
     PRIMARY KEY ((course_id, lesson_id), student_id)
 );
 
--- C10: ¿Qué notificaciones ha recibido recientemente un estudiante y qué tipo de aviso representa cada una?
+-- RF10: notificaciones recientes por estudiante
 CREATE TABLE IF NOT EXISTS notifications_by_student (
     student_id text,
     notification_time timestamp,
