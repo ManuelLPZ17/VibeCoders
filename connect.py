@@ -5,18 +5,7 @@ except ImportError:
 
 CASSANDRA_IMPORT_ERROR = None
 try:
-    import sys
-    import types
-
     from cassandra import InvalidRequest
-    from cassandra.io.asyncioreactor import AsyncioConnection
-
-    # cassandra-driver 3.x still tries asyncore by default, but asyncore was
-    # removed in Python 3.12. Reuse the driver's asyncio reactor instead.
-    asyncore_module = types.ModuleType("cassandra.io.asyncorereactor")
-    asyncore_module.AsyncoreConnection = AsyncioConnection
-    sys.modules.setdefault("cassandra.io.asyncorereactor", asyncore_module)
-
     from cassandra.cluster import Cluster, NoHostAvailable
 except Exception as exc:
     Cluster = None
