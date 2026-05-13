@@ -7,12 +7,16 @@ from connect import connect_dgraph
 
 MENU = {
     "MongoDB": {
-        "1":  "Buscar cursos por texto, categoria e idioma",
-        "2":  "Ver perfil completo de un estudiante",
-        "3":  "Ver progreso de un estudiante en sus cursos",
-        "4":  "Listar certificados obtenidos por un usuario",
-        "5":  "Ver resenas de un curso",
-        "6":  "Calcular promedio de rating por curso",
+        "1":  "RF01 — Listar cursos publicados por instructor",
+        "2":  "RF02 — Buscar cursos por texto, categoria e idioma",
+        "3":  "RF03 — Ver progreso de un estudiante en un curso especifico",
+        "4":  "RF04 — Ver materiales adjuntos de las lecciones de un curso",
+        "5":  "RF05 — Ver perfil completo de un usuario",
+        "6":  "RF06 — Ver inbox de mensajes de un usuario",
+        "7":  "RF07 — Ver quizzes de un curso con criterios de aprobacion",
+        "8":  "RF08 — Listar certificados obtenidos por un usuario",
+        "9":  "RF09 — Ver historial de cursos inscritos por estudiante",
+        "10": "RF10 — Ver anuncios no leidos y engagement por curso",
     },
     "Cassandra": {
         "7":  "Ver sesiones de estudio recientes",
@@ -81,7 +85,9 @@ def run_menu():
                 break
 
             if db_choice.upper() == "P":
+                from Mongo.populate_mongo import populate_mongo
                 from Dgraph.populate_dgraph import populate_dgraph
+                populate_mongo(reset=True)
                 populate_dgraph(reset=True)
                 continue
 
@@ -112,6 +118,9 @@ def run_menu():
                 if db_name == "Dgraph":
                     from Dgraph.queries_dgraph import run_query
                     run_query(option, get_dgraph())
+                elif db_name == "MongoDB":
+                    from Mongo.queries_mongo import run_query as run_mongo_query
+                    run_mongo_query(option)
                 else:
                     print("  (pendiente de implementacion)")
 
