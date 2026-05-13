@@ -1,4 +1,9 @@
 id_examen,preguntas
-E1,10 preguntas
-E2,15 preguntas
-E3,20 preguntas
+E1,¿Que es HTTP?;¿Que es REST?;¿Para que sirve JSON?
+E2,Resuelve 2x+3=11;Factoriza x^2-9;¿Que es derivada?
+E3,¿Que es un grafo?;¿Que es NoSQL?;¿Que es un nodo?;¿Que es un edge?
+E4,¿Que es herencia en POO?;¿Que es polimorfismo?;Escribe una clase en Python
+E5,¿Que es media aritmetica?;¿Que es varianza?;Calcula la desviacion estandar
+E6,¿Que es una llave primaria?;¿Que es un JOIN?;¿Que diferencia hay entre SQL y NoSQL?
+E7,¿Que es un phrasal verb?;Conjuga el verbo to be en presente;¿Que es el presente perfecto?
+E8,¿Que es el limite de una funcion?;¿Que es la regla de la cadena?;Deriva f(x)=3x^2+5x
