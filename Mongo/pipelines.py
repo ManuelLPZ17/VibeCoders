@@ -1,13 +1,8 @@
 from datetime import datetime, timezone
-from pymongo import MongoClient
-
-client = MongoClient("mongodb://localhost:27017/")
-db = client["vibecoders"]
 
 
 # RF03 — Progreso del estudiante por lección
-# Calcula el porcentaje de avance cruzando completed_lessons con el total de lecciones del curso.
-def progreso_usuario(user_id, course_id):
+def progreso_usuario(db, user_id, course_id):
     pipeline = [
         {"$match": {"user_id": user_id, "course_id": course_id}},
         {
@@ -33,8 +28,7 @@ def progreso_usuario(user_id, course_id):
 
 
 # RF09 — Historial de cursos inscritos
-# Lista todos los cursos de un usuario con su estado actual, ordenados por último acceso.
-def historial_cursos(user_id):
+def historial_cursos(db, user_id):
     pipeline = [
         {"$match": {"user_id": user_id}},
         {"$sort": {"last_accessed_at": -1}},
@@ -52,8 +46,7 @@ def historial_cursos(user_id):
 
 
 # RF08 — Certificados obtenidos por usuario
-# Recupera todos los certificados de un usuario ordenados por fecha de emisión más reciente.
-def certificados_usuario(user_id):
+def certificados_usuario(db, user_id):
     pipeline = [
         {"$match": {"user_id": user_id}},
         {"$sort": {"issue_date": -1}},
@@ -70,9 +63,7 @@ def certificados_usuario(user_id):
 
 
 # RF06 — Inbox de mensajes — conversaciones activas
-# Lista las conversaciones del usuario mostrando primero las que tienen mensajes no leídos,
-# luego por recencia. Aprovecha el multi-key index de unread_by.
-def inbox(user_id):
+def inbox(db, user_id):
     pipeline = [
         {"$match": {"participants": user_id}},
         {
@@ -99,9 +90,7 @@ def inbox(user_id):
 
 
 # RF10 — Anuncios no leídos del usuario
-# Recupera los anuncios vigentes de los cursos del estudiante que aún no ha leído.
-# Se cruza announcements con user_announcements para determinar cuáles ya fueron leídos.
-def anuncios_no_leidos(user_id, course_ids):
+def anuncios_no_leidos(db, user_id, course_ids):
     pipeline = [
         {
             "$match": {
@@ -145,9 +134,7 @@ def anuncios_no_leidos(user_id, course_ids):
 
 
 # RF10 — Reporte de engagement por anuncio
-# Calcula la tasa de lectura de cada anuncio de un curso.
-# Útil para que el instructor identifique qué comunicados no están llegando a sus estudiantes.
-def engagement_anuncios(course_id):
+def engagement_anuncios(db, course_id):
     pipeline = [
         {"$match": {"course_id": course_id}},
         {
@@ -174,4 +161,3 @@ def engagement_anuncios(course_id):
         {"$sort": {"read_rate": -1}}
     ]
     return list(db.announcements.aggregate(pipeline))
-

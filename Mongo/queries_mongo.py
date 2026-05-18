@@ -2,8 +2,8 @@ import json
 from datetime import datetime
 from bson import ObjectId
 
+from connect import connect_mongo
 from Mongo.pipelines import (
-    db,
     progreso_usuario,
     historial_cursos,
     certificados_usuario,
@@ -11,6 +11,9 @@ from Mongo.pipelines import (
     anuncios_no_leidos,
     engagement_anuncios,
 )
+
+db = connect_mongo()
+
 
 # ─── Helper de serialización ────────────────────────────────────────────────
 
@@ -99,7 +102,7 @@ def _q3_progreso_estudiante():
     if not curso:
         return
 
-    resultados = progreso_usuario(usuario["_id"], curso["_id"])
+    resultados = progreso_usuario(db, usuario["_id"], curso["_id"])
     _print(resultados)
 
 
@@ -132,7 +135,7 @@ def _q6_inbox():
     usuario = _get_user(email)
     if not usuario:
         return
-    resultados = inbox(usuario["_id"])
+    resultados = inbox(db, usuario["_id"])
     _print(resultados)
 
 
@@ -158,7 +161,7 @@ def _q8_certificados():
     usuario = _get_user(email)
     if not usuario:
         return
-    resultados = certificados_usuario(usuario["_id"])
+    resultados = certificados_usuario(db, usuario["_id"])
     _print(resultados)
 
 
@@ -169,7 +172,7 @@ def _q9_historial_cursos():
     usuario = _get_user(email)
     if not usuario:
         return
-    resultados = historial_cursos(usuario["_id"])
+    resultados = historial_cursos(db, usuario["_id"])
     _print(resultados)
 
 
@@ -194,7 +197,7 @@ def _q10_anuncios():
         if not course_ids:
             print("  El estudiante no tiene inscripciones.")
             return
-        resultados = anuncios_no_leidos(usuario["_id"], course_ids)
+        resultados = anuncios_no_leidos(db, usuario["_id"], course_ids)
         _print(resultados)
 
     elif sub == "2":
@@ -202,7 +205,7 @@ def _q10_anuncios():
         curso = _get_course(titulo)
         if not curso:
             return
-        resultados = engagement_anuncios(curso["_id"])
+        resultados = engagement_anuncios(db, curso["_id"])
         _print(resultados)
 
     else:
